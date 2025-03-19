@@ -1,23 +1,110 @@
 <!DOCTYPE html>
-<html>
+<html lang="uk">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assistance Chat</title>
+    <style>body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #4CAF50;
+    }
+
+    form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+        width: 70%;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        padding: 10px 20px;
+        font-size: 16px;
+        margin-left: 10px;
+        cursor: pointer;
+        border: 1px solid #4CAF50;
+        background-color: #4CAF50;
+        color: white;
+        border-radius: 4px;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    #messages {
+        margin-top: 20px;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        padding: 10px;
+        background-color: white;
+        border-radius: 5px;
+    }
+
+    #messages div {
+        margin-bottom: 10px;
+        padding: 5px;
+        background-color: #f9f9f9;
+        border-radius: 4px;
+    }
+
+    input[type="file"] {
+        display: block;
+        margin: 20px auto;
+    }
+
+    button[onclick="sendVoice"] {
+        display: block;
+        margin: 20px auto;
+        padding: 10px 20px;
+        background-color: #FF5722;
+        border: 1px solid #FF5722;
+        color: white;
+        font-size: 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    button[onclick="sendVoice"]:hover {
+        background-color: #FF4511;
+    }
+
+    </style>
+
 </head>
 <body>
-<h1> Chat</h1>
+<h1>AI Chat</h1>
+
 <form onsubmit="sendMessage(event)">
-    <input type="text" id="messageText" autocomplete="off" placeholder="Type a message"/>
-    <button type="submit">Send</button>
+    <input type="text" id="messageText" autocomplete="off" placeholder="enter message"/>
+    <button type="submit">send</button>
 </form>
 
+<button onclick="sendVoice()">🎤send voice</button>
+
 <input type="file" id="imageInput" accept="image/*"/>
+
 <div id="messages"></div>
 
 <script>
     var ws = new WebSocket("ws://localhost:8000/wb");
 
     ws.onmessage = function (event) {
-        var messages = document.getElementById('messages'); // get out mess
+        var messages = document.getElementById('messages');
         var message = document.createElement('div');
         var content = document.createTextNode(event.data);
         message.appendChild(content);
@@ -49,6 +136,10 @@
         event.preventDefault();
     }
 
+    function sendVoice() {
+        var messageData = {command: "voice"};
+        sendToServer(messageData);
+    }
 
     function sendToServer(messageData) {
         ws.send(JSON.stringify(messageData));
