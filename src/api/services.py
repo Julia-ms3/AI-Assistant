@@ -3,7 +3,6 @@ import os
 
 import PIL.Image
 from dotenv import load_dotenv
-from fastapi import UploadFile
 from google import genai
 
 load_dotenv()
@@ -19,8 +18,7 @@ async def text_response(content):
     return response.text
 
 
-def image_response(request, img_file: UploadFile):
-    img_data = img_file.file.read()
+async def image_response(request, img_data: bytes):
     img = PIL.Image.open(io.BytesIO(img_data))
 
     response = client.models.generate_content(

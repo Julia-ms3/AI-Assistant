@@ -1,22 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Chat</title>
-
+    <title>Assistance Chat</title>
 </head>
 <body>
-<h1>WebSocket Chat</h1>
-<form action="" onsubmit="sendMessage(event)">
-    <input type="text" id="messageText" autocomplete="off"/>
-    <button>Send</button>
+<h1> Chat</h1>
+<form onsubmit="sendMessage(event)">
+    <input type="text" id="messageText" autocomplete="off" placeholder="Type a message"/>
+    <button type="submit">Send</button>
 </form>
+
+<input type="file" id="imageInput" accept="image/*"/>
 <div id="messages"></div>
 
 <script>
     var ws = new WebSocket("ws://localhost:8000/wb");
 
     ws.onmessage = function (event) {
-        var messages = document.getElementById('messages');
+        var messages = document.getElementById('messages'); // get out mess
         var message = document.createElement('div');
         var content = document.createTextNode(event.data);
         message.appendChild(content);
@@ -25,9 +26,32 @@
 
     function sendMessage(event) {
         var input = document.getElementById("messageText");
-        ws.send(input.value);
+        var imageInput = document.getElementById("imageInput");
+        var messageData = {text: input.value};
+
+        if (imageInput.files.length > 0) {
+            var file = imageInput.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function () {
+                var base64Data = reader.result.split(",")[1];
+                messageData.image = base64Data;
+                sendToServer(messageData);
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            sendToServer(messageData);
+        }
+
         input.value = '';
+        imageInput.value = '';
         event.preventDefault();
+    }
+
+
+    function sendToServer(messageData) {
+        ws.send(JSON.stringify(messageData));
     }
 </script>
 </body>
